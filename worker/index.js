@@ -1,5 +1,6 @@
 // Cloudflare Worker: serves the static SPA, proxies LLM calls (key stays
 // server-side), and persists quiz history to KV — all from one origin.
+import project from "../project.json";
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
@@ -62,6 +63,16 @@ export default {
         return json({ ok: true });
       }
       return json({ error: "method not allowed" }, 405);
+    }
+
+    // --- Portfolio schema doc (read cross-origin by the portfolio site) --
+    if (url.pathname === "/project.json") {
+      return new Response(JSON.stringify(project), {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
     }
 
     // --- Static assets (the Vite build) ----------------------------------

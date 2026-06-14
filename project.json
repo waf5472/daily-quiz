@@ -1,0 +1,7 @@
+{
+  "name": "Daily Drill",
+  "description": "Pick your own study topics and get fresh, AI-generated quiz questions every day — answers graded by Claude, with history synced across devices. Single Cloudflare Worker serves the app and proxies the LLM so the API key never reaches the browser.",
+  "link": "https://daily-quiz.example.workers.dev",
+  "repo": "https://github.com/waf5472/daily-quiz",
+  "tags": ["React", "Cloudflare Worker", "Anthropic", "KV"]
+}
