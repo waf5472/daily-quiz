@@ -1,0 +1,19 @@
+# Non-secret config only. The Anthropic key is NEVER stored here —
+# it is set as a Worker secret via Doppler or `wrangler secret put`.
+
+name = "daily-quiz"
+main = "worker/index.js"
+compatibility_date = "2025-01-01"
+
+# Serve the Vite build, with SPA fallback so client routing works.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+# Cross-device quiz history. Create with:
+#   npx wrangler kv namespace create QUIZ_KV
+# then paste the returned id below.
+[[kv_namespaces]]
+binding = "QUIZ_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
