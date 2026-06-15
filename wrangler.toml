@@ -16,4 +16,4 @@ not_found_handling = "single-page-application"
 # then paste the returned id below.
 [[kv_namespaces]]
 binding = "QUIZ_KV"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "095153f8f1dd4893a1929e1f1b7e7c0c"

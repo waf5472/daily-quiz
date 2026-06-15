@@ -1,7 +1,7 @@
 {
   "name": "Daily Drill",
   "description": "I made this tool to study Portuguese, Spanish, and robotics topics in parallel and check my progress. Pick your own study topics and get fresh, AI-generated quiz questions every day — answers graded by Claude and history tracked so you can see your progress. Key-protected Cloudflare Worker serves the app and proxies the LLM.",
-  "link": "https://daily-quiz.example.workers.dev",
+  "link": "https://daily-quiz.waf5472.workers.dev",
   "repo": "https://github.com/waf5472/daily-quiz",
   "tags": ["Claude Code", "Cloudflare Worker", "React", "JS"]
 }
