@@ -5,6 +5,13 @@ import project from "../project.json";
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
 
+// Cost guards: this Worker holds the API key, so it forces a cheap model, caps
+// output, and rate-limits per IP. The browser cannot pick a pricier model or
+// hammer the proxy — the request body it sends is sanitized below.
+const SAFE_MODEL = "claude-haiku-4-5";
+const MAX_TOKENS = 1024;
+const MAX_CALLS_PER_DAY = 60; // ~20 quiz questions/day per IP (≈3 calls each)
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -16,8 +23,28 @@ export default {
       if (!env.ANTHROPIC_API_KEY) {
         return json({ error: "ANTHROPIC_API_KEY not configured on the Worker" }, 500);
       }
+      // Per-IP daily rate limit (best-effort, KV-backed; skipped if KV unbound).
+      if (env.QUIZ_KV) {
+        const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+        const day = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+        const rlKey = `rl:${ip}:${day}`;
+        const used = parseInt((await env.QUIZ_KV.get(rlKey)) || "0", 10);
+        if (used >= MAX_CALLS_PER_DAY) {
+          return json({ error: "Daily limit reached — come back tomorrow." }, 429);
+        }
+        await env.QUIZ_KV.put(rlKey, String(used + 1), { expirationTtl: 172800 });
+      }
+
       let body;
       try { body = await request.json(); } catch { return json({ error: "bad JSON" }, 400); }
+      if (!Array.isArray(body?.messages)) return json({ error: "messages[] required" }, 400);
+
+      // Force a cheap model + token cap regardless of what the browser sent.
+      const safeBody = {
+        model: SAFE_MODEL,
+        max_tokens: Math.min(Number(body.max_tokens) || MAX_TOKENS, MAX_TOKENS),
+        messages: body.messages,
+      };
 
       const upstream = await fetch(ANTHROPIC_URL, {
         method: "POST",
@@ -26,7 +53,7 @@ export default {
           "x-api-key": env.ANTHROPIC_API_KEY,
           "anthropic-version": ANTHROPIC_VERSION,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(safeBody),
       });
       // Pass the response straight back; same origin means no CORS dance.
       return new Response(upstream.body, {

@@ -37,7 +37,7 @@ const CUSTOM_TOPICS_KEY = "vd_custom_topics_v1";
 // Update this to your deployed portfolio URL before publishing.
 const PORTFOLIO_URL = "/";
 
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "claude-haiku-4-5";
 const API_URL = "/api/chat";
 
 // ---------------------------------------------------------------------------
