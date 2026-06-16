@@ -5,6 +5,9 @@ name = "daily-quiz"
 main = "worker/index.js"
 compatibility_date = "2025-01-01"
 
+# Custom domain — portfolio apps live at <project-name>.wesley-fletcher.com
+routes = [{ pattern = "daily-quiz.wesley-fletcher.com", custom_domain = true }]
+
 # Serve the Vite build, with SPA fallback so client routing works.
 [assets]
 directory = "./dist"
