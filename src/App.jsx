@@ -5,9 +5,9 @@ import { Download, ChevronRight, ChevronLeft, RotateCcw, Flame, Target, Loader2,
 // Topic framework — Americas split into Ecology / Agriculture
 // ---------------------------------------------------------------------------
 const TOPICS = [
-  { id: "dogs",    label: "Dog Breeds",   pillar: "Nature",    hint: "breed characteristics, temperament, history, working roles, grooming needs, and health traits" },
-  { id: "spanish", label: "Spanish",      pillar: "Language",  hint: "vocabulary, grammar, verb conjugation, reading comprehension, and everyday conversation" },
-  { id: "python",  label: "Python",       pillar: "Tech",      hint: "syntax, data structures, OOP, standard library, common patterns, and debugging" },
+  { id: "dogs",    label: "Name That Dog Breed",  pillar: "Nature",    hint: "breed characteristics, temperament, history, working roles, grooming needs, and health traits" },
+  { id: "spanish", label: "Spanish Translation",  pillar: "Language",  hint: "vocabulary, grammar, verb conjugation, reading comprehension, and everyday conversation" },
+  { id: "python",  label: "Geography",            pillar: "Tech",      hint: "world geography, capitals, physical features, countries, continents, regions, and human geography" },
   { id: "anatomy", label: "Anatomy",      pillar: "Science",   hint: "body systems, organs, tissues, physiology, and medical terminology" },
   { id: "repair",  label: "Home Repair",  pillar: "Practical", hint: "plumbing basics, electrical safety, drywall, painting, carpentry, HVAC, and tool use" },
 ];
@@ -183,9 +183,10 @@ function topicWeight(stat) {
   return scoreGap * 2 + recency + 0.5;
 }
 function pickTopics(stats, n, topicPool = TOPICS) {
-  const pool = topicPool.map((t) => ({ t, w: topicWeight(stats[t.id]) }));
+  let pool = topicPool.map((t) => ({ t, w: topicWeight(stats[t.id]) }));
   const chosen = [];
-  for (let i = 0; i < n && pool.length; i++) {
+  for (let i = 0; i < n; i++) {
+    if (!pool.length) pool = topicPool.map((t) => ({ t, w: topicWeight(stats[t.id]) }));
     const total = pool.reduce((a, b) => a + b.w, 0);
     let r = Math.random() * total, idx = 0;
     for (let j = 0; j < pool.length; j++) { r -= pool[j].w; if (r <= 0) { idx = j; break; } }
@@ -322,7 +323,7 @@ export default function App() {
     ...TOPICS.filter((t) => !deletedTopicIds.has(t.id)),
     ...customTopics,
   ], [deletedTopicIds, customTopics]);
-  const effectiveCount = Math.min(count, activeList.length);
+  const effectiveCount = count;
 
   const stats = useMemo(() => computeStats(history, activeList), [history, activeList]);
   const streak = useMemo(() => computeStreak(history), [history]);
@@ -451,16 +452,13 @@ export default function App() {
 
             <div className="font-mono2 text-[11px] tracking-wider text-[#999999] mb-2.5">HOW MANY QUESTIONS?</div>
             <div className="grid grid-cols-5 gap-2 mb-5">
-              {[1, 2, 3, 4, 5].map((n) => {
-                const tooMany = n > activeList.length;
-                return (
-                  <button key={n} onClick={() => !tooMany && setCount(n)} disabled={tooMany}
-                    className="py-3.5 rounded-xl font-display text-[22px] transition-all border disabled:opacity-30"
-                    style={{ background: count === n && !tooMany ? "#22c55e" : "#1a1a1a", color: count === n && !tooMany ? "#000000" : "#f5f5f5", borderColor: count === n && !tooMany ? "#22c55e" : "#333333" }}>
-                    {n}
-                  </button>
-                );
-              })}
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button key={n} onClick={() => setCount(n)}
+                  className="py-3.5 rounded-xl font-display text-[22px] transition-all border"
+                  style={{ background: count === n ? "#22c55e" : "#1a1a1a", color: count === n ? "#000000" : "#f5f5f5", borderColor: count === n ? "#22c55e" : "#333333" }}>
+                  {n}
+                </button>
+              ))}
             </div>
 
             <button onClick={startSession} disabled={mode === "topic" && !selectedTopic}
