@@ -89,7 +89,7 @@ npm run deploy        # vite build + wrangler deploy
 All content lives in the `TOPICS` array at the top of `src/App.jsx`:
 
 ```js
-{ id: "uniqueid", label: "Display Name", pillar: "Forager1", hint: "comma, separated, scope keywords the LLM uses to generate questions" }
+{ id: "uniqueid", label: "Display Name", pillar: "Project Set 1", hint: "comma, separated, scope keywords the LLM uses to generate questions" }
 ```
 
 - `id` — stable unique string (used as the KV/stats key; don't reuse an old id)
